@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import crypto from "crypto"
 
+
 const userSchema = new mongoose.Schema({
     fullName:{
         type: String,
@@ -32,7 +33,7 @@ const userSchema = new mongoose.Schema({
     role:{
         type:String,
         enum:["user", "admin"],
-        default: user
+        default: "user"
     },
     addresses:[
         {
@@ -87,13 +88,13 @@ const userSchema = new mongoose.Schema({
     }
 }, {timestamps: true})
 
-userSchema.pre("save", async function(next){
+userSchema.pre("save", async function(){
     //  do not save password each time 
 
-    if(!this.isModified("password")) return next();
+    if(!this.isModified("password")) return ;
 
     this.password = await bcrypt.hash(this.password, 10)
-    next()
+    
 })
 
 userSchema.methods.isPasswordCorrect =  async function(password){
@@ -125,5 +126,6 @@ userSchema.methods.generateRefreshToken = function(){
         }
      )
 } 
+
 
 export const User = mongoose.model("User", userSchema)
